@@ -68,7 +68,15 @@ export default function Footer() {
         <div className="mt-8 pt-4 border-t border-slate-800 text-xs text-slate-400 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <p>(c) {year} LMS. All rights reserved.</p>
           <p>
-            Built by <span className="font-bold text-cyan-400">@pratik</span>
+            Built by{" "}
+            <a
+              href="https://pratik-web.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-cyan-400 hover:text-cyan-300 transition"
+            >
+              @pratik
+            </a>
           </p>
         </div>
       </div>
