@@ -6,6 +6,15 @@ const submissionSchema = new mongoose.Schema({
     ref: "User"
   },
   answer: String,
+  answerText: String,
+  comment: {
+    type: String,
+    default: ""
+  },
+  isViewed: {
+    type: Boolean,
+    default: true
+  },
   status: {
     type: String,
     enum: ["pending", "pass", "fail"],

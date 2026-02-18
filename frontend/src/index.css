@@ -1,3 +1,89 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Sora:wght@600;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.home-font-body {
+  font-family: "Manrope", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.home-font-title {
+  font-family: "Sora", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.home-shell {
+  background:
+    radial-gradient(circle at 10% -10%, rgba(8, 145, 178, 0.18), transparent 45%),
+    radial-gradient(circle at 90% 0%, rgba(59, 130, 246, 0.18), transparent 40%),
+    linear-gradient(180deg, #f8fafc 0%, #f0f9ff 100%);
+}
+
+.home-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(48px);
+  opacity: 0.55;
+  animation: homeFloat 8s ease-in-out infinite;
+}
+
+.home-orb-one {
+  width: 16rem;
+  height: 16rem;
+  top: -5rem;
+  right: -3rem;
+  background: linear-gradient(135deg, #22d3ee, #818cf8);
+}
+
+.home-orb-two {
+  width: 18rem;
+  height: 18rem;
+  bottom: -7rem;
+  left: -4rem;
+  background: linear-gradient(135deg, #34d399, #38bdf8);
+  animation-delay: 0.8s;
+}
+
+.home-grid-pattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at 20% 20%, black 10%, transparent 70%);
+  pointer-events: none;
+}
+
+.home-rise {
+  animation: homeRise 0.6s ease both;
+}
+
+.home-rise-delay-1 {
+  animation-delay: 0.12s;
+}
+
+.home-rise-delay-2 {
+  animation-delay: 0.24s;
+}
+
+@keyframes homeFloat {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  50% {
+    transform: translateY(10px) translateX(-8px);
+  }
+}
+
+@keyframes homeRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

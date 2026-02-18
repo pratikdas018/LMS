@@ -26,6 +26,12 @@ export default function Sidebar({ role }) {
         <ul className="space-y-3">
           <li>
             <NavLink to="/dashboard/courses" end className={linkClass}>
+              Courses
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink to="/dashboard/my-courses" end className={linkClass}>
               My Courses
               {notificationCount > 0 && (
                 <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full ml-2">

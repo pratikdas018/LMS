@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import api from "../utils/axios";
 import TeacherTasks from "./TeacherTasks";
 import TeacherAnalytics from "./TeacherAnalytics";
@@ -12,86 +12,91 @@ export default function TeacherDashboard() {
   useEffect(() => {
     api
       .get("/courses")
-      .then(res => setCourses(res.data))
+      .then((res) => setCourses(Array.isArray(res.data) ? res.data : []))
       .catch(() => setCourses([]));
   }, []);
 
+  const selectedCourseTitle = useMemo(() => {
+    const found = courses.find((course) => course._id === selectedCourse);
+    return found?.title || "No course selected";
+  }, [courses, selectedCourse]);
+
   return (
-    <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="space-y-6">
+      <section className="rounded-3xl border border-emerald-100 bg-gradient-to-r from-emerald-50 via-sky-50 to-white p-6 sm:p-8">
+        <p className="text-xs font-semibold tracking-[0.12em] text-emerald-700">TEACHER WORKSPACE</p>
+        <h2 className="mt-2 text-2xl sm:text-3xl font-black text-slate-900">Course Management Hub</h2>
+        <p className="mt-2 text-sm text-slate-600 max-w-3xl">
+          Create tasks and quizzes, review student submissions, and monitor performance
+          from one focused dashboard.
+        </p>
 
-        {/* 🔹 Header + Course Selector */}
-        <div className="sticky top-0 z-10 bg-gray-50 pb-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
-              Teacher Panel 🍎
-            </h2>
-
-            <div className="w-full md:w-72">
-              <select
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm
-                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                outline-none transition bg-white text-sm sm:text-base"
-                value={selectedCourse}
-                onChange={(e) => setSelectedCourse(e.target.value)}
-              >
-                <option value="">Select a Course</option>
-                {courses.map(c => (
-                  <option key={c._id} value={c._id}>
-                    {c.title}
-                  </option>
-                ))}
-              </select>
+        <div className="mt-5 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-end">
+          <div className="grid grid-cols-2 gap-3 text-center">
+            <div className="rounded-xl border border-emerald-100 bg-white p-3">
+              <p className="text-xs text-slate-500">Courses</p>
+              <p className="text-xl font-black text-slate-900">{courses.length}</p>
+            </div>
+            <div className="rounded-xl border border-emerald-100 bg-white p-3">
+              <p className="text-xs text-slate-500">Active Course</p>
+              <p className="text-sm font-bold text-emerald-700 truncate">{selectedCourse ? "Selected" : "None"}</p>
             </div>
           </div>
+
+          <div className="w-full md:w-80">
+            <label className="block text-xs font-semibold text-slate-600 mb-1">Choose Course</label>
+            <select
+              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+            >
+              <option value="">Select a course</option>
+              {courses.map((course) => (
+                <option key={course._id} value={course._id}>
+                  {course.title}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
+      </section>
 
-        {/* 🔹 Empty State */}
-        {!selectedCourse ? (
-          <div className="mt-10 text-center bg-white rounded-xl shadow-sm border p-8">
-            <p className="text-gray-500 text-base sm:text-lg">
-              Please select a course to manage 📚
-            </p>
+      {!selectedCourse ? (
+        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center">
+          <h3 className="text-lg font-bold text-slate-900">Select a course to continue</h3>
+          <p className="text-sm text-slate-600 mt-1">
+            Once selected, you can create tasks/quizzes and review student work.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700">
+            Managing: <span className="font-bold text-slate-900">{selectedCourseTitle}</span>
           </div>
-        ) : (
-          <div className="mt-6 space-y-6">
 
-            {/* 📌 Tasks Section */}
-            <section className="bg-white rounded-xl shadow-sm border p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-semibold mb-4">
-                📌 Tasks
-              </h3>
-              <TeacherTasks courseId={selectedCourse} />
-            </section>
+          <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
+            <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 mb-4">Tasks</h3>
+            <TeacherTasks courseId={selectedCourse} />
+          </section>
 
-            {/* 📝 Quiz Section */}
-            <section className="bg-white rounded-xl shadow-sm border p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-semibold mb-4">
-                📝 Quiz Management
-              </h3>
-              <TeacherQuiz courseId={selectedCourse} />
-            </section>
+          <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
+            <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 mb-4">Quiz Management</h3>
+            <TeacherQuiz courseId={selectedCourse} />
+          </section>
 
-            {/* 📊 Review & Analytics */}
-            <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl shadow-sm border p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-semibold mb-4">
-                  🔍 Quiz Review
-                </h3>
-                <TeacherQuizReview courseId={selectedCourse} />
-              </div>
+          <section className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 mb-4">Quiz Review</h3>
+              <TeacherQuizReview courseId={selectedCourse} />
+            </div>
 
-              <div className="bg-white rounded-xl shadow-sm border p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-semibold mb-4">
-                  📈 Analytics
-                </h3>
-                <TeacherAnalytics courseId={selectedCourse} />
-              </div>
-            </section>
-
-          </div>
-        )}
-      </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 mb-4">Analytics</h3>
+              <TeacherAnalytics courseId={selectedCourse} />
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

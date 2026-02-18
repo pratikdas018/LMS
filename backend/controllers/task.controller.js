@@ -46,6 +46,8 @@ export const submitTask = async (req, res) => {
     existingSubmission.answer = answer;
     existingSubmission.answerText = answer;
     existingSubmission.status = "pending";
+    existingSubmission.comment = "";
+    existingSubmission.isViewed = true;
     existingSubmission.submittedAt = new Date();
   } else {
     task.submissions.push({
@@ -53,6 +55,8 @@ export const submitTask = async (req, res) => {
       answer,
       answerText: answer,
       status: "pending",
+      comment: "",
+      isViewed: true,
       submittedAt: new Date()
     });
   }
@@ -78,7 +82,7 @@ export const gradeTask = async (req, res) => {
 
     const previousStatus = submission.status;
     submission.status = status;
-    submission.comment = comment;
+    submission.comment = typeof comment === "string" ? comment.trim() : "";
     submission.isViewed = false; // 🔔 Mark as unread for student
     await task.save();
 

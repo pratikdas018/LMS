@@ -22,10 +22,34 @@ import taskRoutes from "./routes/task.routes.js";
 dotenv.config();
 const app = express();
 
-app.use(cors({
-  origin: process.env.CLIENT_URL || "*",
-  credentials: true
-}));
+const configuredOrigins = [
+  ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : []),
+  ...(process.env.CLIENT_URLS
+    ? process.env.CLIENT_URLS.split(",").map((origin) => origin.trim())
+    : [])
+].filter(Boolean);
+
+const localDevOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000"
+];
+
+const allowedOrigins = [...new Set([...configuredOrigins, ...localDevOrigins])];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow non-browser requests (curl/postman) and whitelisted browser origins.
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    credentials: true
+  })
+);
 app.use(express.json());
 app.use(passport.initialize());
 app.use("/api/admin", adminRoutes);
@@ -50,6 +74,7 @@ mongoose.connect(process.env.MONGO_URI)
     console.log("------------------------------------------------");
     console.log("🚀 Server Startup Checks (Production Mode):");
     console.log(`✅ CLIENT_URL: ${process.env.CLIENT_URL || "NOT SET"}`);
+    console.log(`✅ ALLOWED_ORIGINS: ${allowedOrigins.join(", ")}`);
     console.log(`✅ BREVO_API_KEY: ${process.env.BREVO_API_KEY ? "SET (Hidden)" : "MISSING ❌"}`);
     console.log(`✅ EMAIL_FROM: ${process.env.EMAIL_FROM || "MISSING ❌"}`);
     console.log(`✅ BREVO_OTP_TEMPLATE_ID: ${process.env.BREVO_OTP_TEMPLATE_ID || "Not Set (Using HTML Fallback) ⚠️"}`);

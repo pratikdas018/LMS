@@ -10,7 +10,7 @@ export default function RoleRoute({ allowedRoles, children }) {
   }
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   if (!allowedRoles.includes(user.role)) {
@@ -19,3 +19,4 @@ export default function RoleRoute({ allowedRoles, children }) {
 
   return children;
 }
+

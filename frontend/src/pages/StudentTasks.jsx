@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import api from "../utils/axios";
 
 export default function StudentTasks({ courseId, onAllTasksPassed }) {
@@ -8,159 +8,216 @@ export default function StudentTasks({ courseId, onAllTasksPassed }) {
     totalTasks: 0
   });
   const [loading, setLoading] = useState(true);
+  const [activeTask, setActiveTask] = useState(null);
+  const [answerText, setAnswerText] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  /* 🔹 LOAD STUDENT TASKS */
-  useEffect(() => {
+  const loadTasks = async () => {
     if (!courseId) return;
 
     setLoading(true);
-
-    api
-      .get(`/tasks/student/${courseId}`)
-      .then(res => {
-        const data = res.data || {};
-
-        const taskList = Array.isArray(data.tasks) ? data.tasks : [];
-
-        setTasks(taskList);
-        setStats({
-          completedTasks: data.completedTasks || 0,
-          totalTasks: data.totalTasks || 0
-        });
-
-        // ✅ Unlock quiz only if ALL tasks are PASSED
-        const allPassed =
-          data.totalTasks > 0 &&
-          data.completedTasks === data.totalTasks;
-
-        if (onAllTasksPassed) {
-          onAllTasksPassed(allPassed);
-        }
-      })
-      .catch(() => {
-        setTasks([]);
-        setStats({ completedTasks: 0, totalTasks: 0 });
-        if (onAllTasksPassed) onAllTasksPassed(false);
-      })
-      .finally(() => setLoading(false));
-  }, [courseId, onAllTasksPassed]);
-
-  /* 🔹 SUBMIT TASK */
-  const submitTask = async taskId => {
-    const answer = prompt("Enter your answer");
-    if (!answer) return;
-
     try {
-      await api.post("/tasks/submit", { taskId, answer });
-
-      // 🔄 Reload tasks after submission
       const res = await api.get(`/tasks/student/${courseId}`);
+      const data = res.data || {};
+      const taskList = Array.isArray(data.tasks) ? data.tasks : [];
 
-      setTasks(res.data.tasks || []);
+      setTasks(taskList);
       setStats({
-        completedTasks: res.data.completedTasks || 0,
-        totalTasks: res.data.totalTasks || 0
+        completedTasks: data.completedTasks || 0,
+        totalTasks: data.totalTasks || 0
       });
 
-      const allPassed =
-        res.data.totalTasks > 0 &&
-        res.data.completedTasks === res.data.totalTasks;
-
-      if (onAllTasksPassed) {
-        onAllTasksPassed(allPassed);
-      }
-    } catch (err) {
-      alert(
-        err.response?.data?.message ||
-          "Failed to submit task"
-      );
+      const allPassed = data.totalTasks > 0 && data.completedTasks === data.totalTasks;
+      if (onAllTasksPassed) onAllTasksPassed(allPassed);
+    } catch {
+      setTasks([]);
+      setStats({ completedTasks: 0, totalTasks: 0 });
+      if (onAllTasksPassed) onAllTasksPassed(false);
+    } finally {
+      setLoading(false);
     }
   };
 
-  /* 🔹 MARK AS READ */
+  useEffect(() => {
+    loadTasks();
+  }, [courseId]);
+
+  const openSubmitModal = (task) => {
+    setActiveTask(task);
+    setAnswerText("");
+  };
+
+  const closeSubmitModal = () => {
+    setActiveTask(null);
+    setAnswerText("");
+    setSubmitting(false);
+  };
+
+  const submitTask = async () => {
+    if (!activeTask?._id) return;
+    if (!answerText.trim()) {
+      alert("Please write your answer before submitting.");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await api.post("/tasks/submit", {
+        taskId: activeTask._id,
+        answer: answerText.trim()
+      });
+      closeSubmitModal();
+      await loadTasks();
+    } catch (err) {
+      setSubmitting(false);
+      alert(err.response?.data?.message || "Failed to submit task");
+    }
+  };
+
   const markAsRead = async (taskId) => {
     try {
       await api.put(`/tasks/${taskId}/read`);
-      setTasks(prev => prev.map(t => {
-        if (t._id === taskId && t.submission) {
-          return { ...t, submission: { ...t.submission, isViewed: true } };
-        }
-        return t;
-      }));
-    } catch (err) { console.error(err); }
+      setTasks((prev) =>
+        prev.map((task) => {
+          if (task._id === taskId && task.submission) {
+            return { ...task, submission: { ...task.submission, isViewed: true } };
+          }
+          return task;
+        })
+      );
+    } catch (err) {
+      console.error(err);
+    }
   };
 
+  const completionPercent = useMemo(() => {
+    if (!stats.totalTasks) return 0;
+    return Math.round((stats.completedTasks / stats.totalTasks) * 100);
+  }, [stats.completedTasks, stats.totalTasks]);
+
   return (
-    <div className="bg-white p-4 rounded shadow mb-4">
-      <h3 className="font-semibold mb-3">
-        Tasks ({stats.completedTasks}/{stats.totalTasks})
-      </h3>
+    <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div>
+          <h3 className="text-xl font-extrabold text-slate-900">Tasks</h3>
+          <p className="text-sm text-slate-600 mt-1">
+            Complete and pass all tasks to unlock the final quiz.
+          </p>
+        </div>
+        <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-bold text-slate-700">
+          {stats.completedTasks}/{stats.totalTasks} Passed
+        </div>
+      </div>
 
-      {loading && (
-        <p className="text-gray-500">Loading tasks...</p>
-      )}
+      <div className="mb-5">
+        <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+          <div
+            className="h-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all"
+            style={{ width: `${Math.max(0, Math.min(completionPercent, 100))}%` }}
+          />
+        </div>
+      </div>
 
-      {!loading && tasks.length === 0 && (
-        <p className="text-gray-500">No tasks assigned</p>
-      )}
+      {loading && <p className="text-sm text-slate-500">Loading tasks...</p>}
+      {!loading && tasks.length === 0 && <p className="text-sm text-slate-500">No tasks assigned yet.</p>}
 
-      {tasks.map(task => {
-        const status = task.submission?.status;
+      <div className="space-y-3">
+        {tasks.map((task) => {
+          const status = task.submission?.status;
+          const statusClass =
+            status === "pass"
+              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+              : status === "fail"
+              ? "bg-rose-50 text-rose-700 border-rose-200"
+              : "bg-amber-50 text-amber-700 border-amber-200";
 
-        return (
-          <div key={task._id} className="border p-3 rounded mb-3">
-            <h4 className="font-medium">{task.title}</h4>
-            <p className="text-sm text-gray-700">
-              {task.description}
-            </p>
-
-            {task.deadline && (
-              <p className="text-xs text-gray-500 mt-1">
-                Deadline:{" "}
-                {new Date(task.deadline).toDateString()}
-              </p>
-            )}
-
-            {/* STATUS / ACTION */}
-            {status ? (
-              <div className="mt-2">
-                <div className="flex items-center justify-between">
-                  <p
-                    className={`font-semibold ${
-                      status === "pass"
-                        ? "text-green-600"
-                        : status === "fail"
-                        ? "text-red-600"
-                        : "text-yellow-600"
-                    }`}
-                  >
-                    {status.toUpperCase()}
-                  </p>
-                  {task.submission?.isViewed === false && (
-                    <button onClick={() => markAsRead(task._id)} className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded hover:bg-blue-200 transition">
-                      Mark as Read
-                    </button>
+          return (
+            <article key={task._id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                <div>
+                  <h4 className="font-bold text-slate-900">{task.title}</h4>
+                  <p className="text-sm text-slate-600 mt-1">{task.description}</p>
+                  {task.deadline && (
+                    <p className="text-xs text-slate-500 mt-2">
+                      Deadline: {new Date(task.deadline).toLocaleDateString()}
+                    </p>
                   )}
                 </div>
 
-                {task.submission?.comment && (
-                  <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm">
-                    <p className="font-bold text-gray-700 mb-1">Teacher Feedback:</p>
-                    <p className="text-gray-600 whitespace-pre-wrap">{task.submission.comment}</p>
-                  </div>
+                {status ? (
+                  <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-bold uppercase ${statusClass}`}>
+                    {status}
+                  </span>
+                ) : (
+                  <span className="inline-flex rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
+                    Not Submitted
+                  </span>
                 )}
               </div>
-            ) : (
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                {!status && (
+                  <button
+                    onClick={() => openSubmitModal(task)}
+                    className="rounded-lg bg-emerald-600 text-white px-3 py-1.5 text-sm font-semibold hover:bg-emerald-700 transition"
+                  >
+                    Submit Task
+                  </button>
+                )}
+
+                {task.submission?.isViewed === false && (
+                  <button
+                    onClick={() => markAsRead(task._id)}
+                    className="rounded-lg border border-blue-200 bg-blue-50 text-blue-700 px-3 py-1.5 text-sm font-semibold hover:bg-blue-100 transition"
+                  >
+                    Mark Feedback Read
+                  </button>
+                )}
+              </div>
+
+              {task.submission?.comment && (
+                <div className="mt-3 rounded-lg border border-slate-200 bg-white p-3">
+                  <p className="text-xs font-bold text-slate-700">Teacher Feedback</p>
+                  <p className="text-sm text-slate-600 mt-1 whitespace-pre-wrap">{task.submission.comment}</p>
+                </div>
+              )}
+            </article>
+          );
+        })}
+      </div>
+
+      {activeTask && (
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl">
+            <h4 className="text-lg font-extrabold text-slate-900">Submit Task Answer</h4>
+            <p className="text-sm text-slate-600 mt-1">{activeTask.title}</p>
+
+            <textarea
+              rows={6}
+              className="w-full mt-4 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              placeholder="Write your answer here..."
+              value={answerText}
+              onChange={(e) => setAnswerText(e.target.value)}
+            />
+
+            <div className="mt-4 flex justify-end gap-2">
               <button
-                onClick={() => submitTask(task._id)}
-                className="bg-green-600 text-white px-3 py-1 rounded mt-2"
+                onClick={closeSubmitModal}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
               >
-                Submit Task
+                Cancel
               </button>
-            )}
+              <button
+                onClick={submitTask}
+                disabled={submitting}
+                className="rounded-lg bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700 disabled:opacity-60"
+              >
+                {submitting ? "Submitting..." : "Submit"}
+              </button>
+            </div>
           </div>
-        );
-      })}
-    </div>
+        </div>
+      )}
+    </section>
   );
 }

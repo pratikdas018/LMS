@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
-import Courses from "./pages/Courses";
+import AvailableCourses from "./pages/AvailableCourses";
+import MyCourses from "./pages/MyCourses";
 import Progress from "./pages/Progress";
 import Certificate from "./pages/Certificate";
 import Quiz from "./pages/Quiz";
@@ -27,7 +29,7 @@ function App() {
           <Navbar />
           <div className="flex-grow">
             <Routes>
-              <Route path="/" element={<Login />} />
+              <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/google/callback" element={<GoogleCallback />} />
@@ -42,8 +44,9 @@ function App() {
                   </PrivateRoute>
                 }
               >
-                <Route index element={<Courses />} />
-                <Route path="courses" element={<Courses />} />
+                <Route index element={<MyCourses />} />
+                <Route path="courses" element={<AvailableCourses />} />
+                <Route path="my-courses" element={<MyCourses />} />
                 <Route path="progress" element={<Progress />} />
                 <Route path="certificates" element={<Certificate />} />
                 <Route path="profile" element={<Profile />} />
