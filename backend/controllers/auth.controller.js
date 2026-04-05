@@ -5,6 +5,11 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import sendEmail from "../utils/sendEmail.js";
 
+const isBrevoIpBlockedError = (message = "") =>
+  /unrecognised ip address|unrecognized ip address|authorised ips/i.test(
+    message.toLowerCase()
+  );
+
 export const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -171,10 +176,19 @@ export const login = async (req, res) => {
         email: user.email
       });
     } catch (emailError) {
-      console.error("❌ Email Service Error:", emailError.message);
-      return res.status(500).json({ 
-        message: "Failed to send verification email. Please try again later.", 
-        error: emailError.message 
+      const emailErrMessage = emailError?.message || "Email service unavailable";
+      console.error("❌ Email Service Error:", emailErrMessage);
+
+      if (isBrevoIpBlockedError(emailErrMessage)) {
+        return res.status(503).json({
+          message:
+            "Email provider blocked this IP. Whitelist your IP in Brevo or configure SMTP fallback in backend/.env."
+        });
+      }
+
+      return res.status(500).json({
+        message: "Failed to send verification email. Please try again later.",
+        error: emailErrMessage
       });
     }
   } catch (err) {
@@ -291,7 +305,16 @@ export const resendRegistrationOtp = async (req, res) => {
       });
       res.status(200).json({ message: "OTP resent successfully" });
     } catch (emailError) {
-      console.error("❌ Resend Registration OTP Email Error:", emailError.message);
+      const emailErrMessage = emailError?.message || "Email service unavailable";
+      console.error("❌ Resend Registration OTP Email Error:", emailErrMessage);
+
+      if (isBrevoIpBlockedError(emailErrMessage)) {
+        return res.status(503).json({
+          message:
+            "Email provider blocked this IP. Whitelist your IP in Brevo or configure SMTP fallback in backend/.env."
+        });
+      }
+
       res.status(500).json({ message: "Failed to send email" });
     }
   } catch (err) {
@@ -431,7 +454,16 @@ export const resendOtp = async (req, res) => {
 
       return res.status(200).json({ message: "Verification code sent" });
     } catch (emailError) {
-      console.error("❌ Resend OTP Email Error:", emailError.message);
+      const emailErrMessage = emailError?.message || "Email service unavailable";
+      console.error("❌ Resend OTP Email Error:", emailErrMessage);
+
+      if (isBrevoIpBlockedError(emailErrMessage)) {
+        return res.status(503).json({
+          message:
+            "Email provider blocked this IP. Whitelist your IP in Brevo or configure SMTP fallback in backend/.env."
+        });
+      }
+
       return res.status(500).json({ message: "Email service unavailable" });
     }
   } catch (err) {

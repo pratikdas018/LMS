@@ -19,6 +19,7 @@ import Footer from "./components/Footer";
 import GoogleCallback from "./pages/GoogleCallback";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import CoursePlayer from "./pages/CoursePlayer";
 
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
                 <Route path="certificates" element={<Certificate />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="quiz/:courseId" element={<Quiz />} />
+                <Route path="learn/:courseId" element={<CoursePlayer />} />
 
                 {/* 👨‍🏫 TEACHER */}
                 <Route

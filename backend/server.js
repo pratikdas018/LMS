@@ -6,6 +6,7 @@ import passport from "passport";
 
 import authRoutes from "./routes/auth.routes.js";
 import courseRoutes from "./routes/course.routes.js";
+import courseContentRoutes from "./routes/courseContent.routes.js";
 import progressRoutes from "./routes/progress.routes.js";
 import quizRoutes from "./routes/quiz.routes.js";
 import seedCourses from "./utils/seedCourses.js";
@@ -15,6 +16,8 @@ import userRoutes from "./routes/user.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import teacherRoutes from "./routes/teacher.routes.js";
 import taskRoutes from "./routes/task.routes.js";
+import moduleRoutes from "./routes/module.routes.js";
+import lectureRoutes from "./routes/lecture.routes.js";
 
 
 
@@ -57,8 +60,11 @@ app.use("/api/teacher", teacherRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/course", courseContentRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/quiz", quizRoutes);
+app.use("/api/module", moduleRoutes);
+app.use("/api/lecture", lectureRoutes);
 
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/tasks", taskRoutes);

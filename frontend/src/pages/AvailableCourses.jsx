@@ -109,15 +109,23 @@ export default function AvailableCourses() {
               <h3 className="mt-4 text-xl font-extrabold text-slate-900">{course.title}</h3>
               <p className="mt-2 text-sm text-slate-600 min-h-[2.6rem]">{course.description}</p>
 
-              <div className="mt-5 flex items-center justify-between">
+              <div className="mt-5 flex items-center justify-between gap-2">
                 <span className="text-xs font-semibold text-slate-500">Self-paced learning</span>
-                <button
-                  onClick={() => handleEnroll(course._id)}
-                  disabled={enrollingId === course._id}
-                  className="rounded-xl bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700 disabled:opacity-60 transition"
-                >
-                  {enrollingId === course._id ? "Enrolling..." : "Enroll Now"}
-                </button>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to={`/dashboard/learn/${course._id}`}
+                    className="rounded-xl border border-slate-300 text-slate-700 px-3 py-2 text-sm font-semibold hover:bg-slate-50 transition"
+                  >
+                    Preview
+                  </Link>
+                  <button
+                    onClick={() => handleEnroll(course._id)}
+                    disabled={enrollingId === course._id}
+                    className="rounded-xl bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700 disabled:opacity-60 transition"
+                  >
+                    {enrollingId === course._id ? "Enrolling..." : "Enroll Now"}
+                  </button>
+                </div>
               </div>
             </article>
           ))}

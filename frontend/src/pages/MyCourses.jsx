@@ -112,6 +112,12 @@ export default function MyCourses() {
 
                 <div className="mt-5 flex gap-3">
                   <button
+                    onClick={() => navigate(`/dashboard/learn/${course._id}`)}
+                    className="rounded-xl bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700 transition"
+                  >
+                    Watch Lectures
+                  </button>
+                  <button
                     onClick={() => navigate(`/dashboard/quiz/${course._id}`)}
                     className="rounded-xl bg-blue-600 text-white px-4 py-2 text-sm font-semibold hover:bg-blue-700 transition"
                   >

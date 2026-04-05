@@ -5,7 +5,9 @@ import { protect } from "../middleware/auth.middleware.js";
 import {
   getUserProgress,
   getCourseProgress,
-  recalculateProgress
+  recalculateProgress,
+  markLectureComplete,
+  getCourseLectureProgress
 } from "../controllers/progress.controller.js";
 
 const router = express.Router();
@@ -24,6 +26,11 @@ router.get("/course/:courseId", protect(["teacher", "admin"]), getCourseProgress
  * 🔄 Force Recalculate (Fix inconsistencies)
  */
 router.post("/recalculate", protect(), recalculateProgress);
+
+/**
+ * Lecture progress APIs
+ */
+router.post("/mark-complete", protect(), markLectureComplete);
 
 /**
  * 📈 Overall analytics
@@ -75,5 +82,7 @@ router.get(
     }
   }
 );
+
+router.get("/:courseId", protect(), getCourseLectureProgress);
 
 export default router;

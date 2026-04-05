@@ -4,6 +4,7 @@ import TeacherTasks from "./TeacherTasks";
 import TeacherAnalytics from "./TeacherAnalytics";
 import TeacherQuiz from "./TeacherQuiz";
 import TeacherQuizReview from "./TeacherQuizReview";
+import TeacherLectureManager from "../components/TeacherLectureManager";
 
 export default function TeacherDashboard() {
   const [courses, setCourses] = useState([]);
@@ -77,6 +78,11 @@ export default function TeacherDashboard() {
           <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
             <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 mb-4">Tasks</h3>
             <TeacherTasks courseId={selectedCourse} />
+          </section>
+
+          <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
+            <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 mb-4">Video Lectures</h3>
+            <TeacherLectureManager courseId={selectedCourse} />
           </section>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
