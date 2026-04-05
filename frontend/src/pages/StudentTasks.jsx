@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../utils/axios";
+import AppLoader from "../components/AppLoader";
 
 export default function StudentTasks({ courseId, onAllTasksPassed }) {
   const [tasks, setTasks] = useState([]);
@@ -118,7 +119,7 @@ export default function StudentTasks({ courseId, onAllTasksPassed }) {
         </div>
       </div>
 
-      {loading && <p className="text-sm text-slate-500">Loading tasks...</p>}
+      {loading && <AppLoader compact message="Loading tasks..." className="py-2" />}
       {!loading && tasks.length === 0 && <p className="text-sm text-slate-500">No tasks assigned yet.</p>}
 
       <div className="space-y-3">

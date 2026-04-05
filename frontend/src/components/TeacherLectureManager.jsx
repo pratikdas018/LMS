@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../utils/axios";
+import AppLoader from "./AppLoader";
 
 export default function TeacherLectureManager({ courseId }) {
   const [modules, setModules] = useState([]);
@@ -304,7 +305,7 @@ export default function TeacherLectureManager({ courseId }) {
         <h5 className="text-base font-extrabold text-slate-900">Current Modules & Lectures</h5>
 
         {loading ? (
-          <p className="mt-3 text-sm text-slate-500">Loading content...</p>
+          <AppLoader compact message="Loading content..." className="mt-3" />
         ) : modules.length === 0 ? (
           <p className="mt-3 text-sm text-slate-500">No modules yet. Create your first module.</p>
         ) : (

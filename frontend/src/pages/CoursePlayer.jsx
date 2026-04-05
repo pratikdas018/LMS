@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import api from "../utils/axios";
 import VideoPlayer from "../components/VideoPlayer";
 import LectureSidebar from "../components/LectureSidebar";
+import AppLoader from "../components/AppLoader";
 import { AuthContext } from "../context/AuthContext";
 
 const getInitialLecture = (modules, lastWatchedLecture) => {
@@ -205,7 +206,7 @@ export default function CoursePlayer() {
   }, [allLectures, progress.lastWatchedLecture]);
 
   if (loading) {
-    return <div className="p-6 text-sm text-slate-600">Loading lecture content...</div>;
+    return <AppLoader message="Loading lecture content..." className="p-6" />;
   }
 
   if (error) {

@@ -2,6 +2,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../utils/axios";
 import { AuthContext } from "../context/AuthContext";
+import AppLoader from "../components/AppLoader";
 
 export default function AvailableCourses() {
   const { user } = useContext(AuthContext);
@@ -55,7 +56,7 @@ export default function AvailableCourses() {
   };
 
   if (loading) {
-    return <div className="p-6 text-sm text-slate-600">Loading available courses...</div>;
+    return <AppLoader message="Loading available courses..." className="p-6" />;
   }
 
   return (

@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import api from "../utils/axios";
 import { AuthContext } from "../context/AuthContext";
+import AppLoader from "../components/AppLoader";
 
 export default function AdminPanel() {
   const { user } = useContext(AuthContext);
@@ -31,7 +32,7 @@ export default function AdminPanel() {
     }
   };
 
-  if (loading) return <p>Loading users...</p>;
+  if (loading) return <AppLoader message="Loading users..." className="p-6" />;
 
   return (
     <div>

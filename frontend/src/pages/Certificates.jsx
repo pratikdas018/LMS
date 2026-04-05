@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../utils/axios";
+import AppLoader from "../components/AppLoader";
 
 export default function Certificates() {
   const [certificates, setCertificates] = useState([]);
@@ -22,7 +23,7 @@ export default function Certificates() {
     window.open(`${api.defaults.baseURL}/certificates/download/${certId}`, "_blank");
   };
 
-  if (loading) return <div className="p-6 text-gray-500">Loading certificates...</div>;
+  if (loading) return <AppLoader message="Loading certificates..." className="p-6" />;
 
   return (
     <div className="p-6">

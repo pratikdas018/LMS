@@ -2,6 +2,7 @@ import api from "../utils/axios";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import ProgressBar from "../components/ProgressBar";
+import AppLoader from "../components/AppLoader";
 
 export default function Progress() {
   const { user } = useContext(AuthContext);
@@ -30,7 +31,7 @@ export default function Progress() {
   }, [progress]);
 
   if (loading) {
-    return <div className="p-6 text-sm text-slate-600">Loading progress...</div>;
+    return <AppLoader message="Loading progress..." className="p-6" />;
   }
 
   return (

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../utils/axios";
+import AppLoader from "../components/AppLoader";
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -47,7 +48,7 @@ export default function AdminDashboard() {
   };
 
   if (loading) {
-    return <div className="p-6 text-sm text-slate-600">Loading users...</div>;
+    return <AppLoader message="Loading users..." className="p-6" />;
   }
 
   return (

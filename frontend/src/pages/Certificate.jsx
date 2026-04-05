@@ -2,6 +2,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import api from "../utils/axios";
+import AppLoader from "../components/AppLoader";
 
 export default function Certificate() {
   const { user } = useContext(AuthContext);
@@ -45,7 +46,7 @@ export default function Certificate() {
   }, [certs, courses]);
 
   if (loading) {
-    return <div className="p-6 text-sm text-slate-600">Loading certificates...</div>;
+    return <AppLoader message="Loading certificates..." className="p-6" />;
   }
 
   return (

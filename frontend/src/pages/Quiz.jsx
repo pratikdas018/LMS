@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../utils/axios";
 import StudentTasks from "./StudentTasks";
+import AppLoader from "../components/AppLoader";
 
 export default function Quiz() {
   const { courseId } = useParams();
@@ -166,7 +167,7 @@ export default function Quiz() {
         )}
 
         {tasksCompleted && loadingQuiz && (
-          <p className="text-sm text-slate-500">Loading quiz...</p>
+          <AppLoader compact message="Loading quiz..." className="py-2" />
         )}
 
         {tasksCompleted && attempted && (

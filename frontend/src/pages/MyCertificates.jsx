@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../utils/axios";
+import AppLoader from "../components/AppLoader";
 
 export default function MyCertificates() {
   const [certificates, setCertificates] = useState([]);
@@ -18,7 +19,7 @@ export default function MyCertificates() {
       });
   }, []);
 
-  if (loading) return <div className="p-8 text-center">Loading certificates...</div>;
+  if (loading) return <AppLoader message="Loading certificates..." className="p-6" />;
 
   return (
     <div className="p-6 max-w-5xl mx-auto">

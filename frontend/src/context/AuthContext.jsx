@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import api from "../utils/axios"; // Ensure this path is correct
+import AppLoader from "../components/AppLoader";
 
 export const AuthContext = createContext();
 
@@ -85,7 +86,12 @@ export const AuthProvider = ({ children }) => {
 
   // ✅ 4. Prevent rendering children until we know if the user is logged in
   if (loading) {
-    return <div className="text-center mt-20">Loading...</div>; 
+    return (
+      <AppLoader
+        message="Preparing your dashboard..."
+        className="min-h-screen flex items-center justify-center px-4 bg-slate-50"
+      />
+    );
   }
 
   return (

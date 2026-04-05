@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import api from "../utils/axios";
 import { AuthContext } from "../context/AuthContext";
+import AppLoader from "../components/AppLoader";
 
 export default function StudentDashboard() {
   const { user } = useContext(AuthContext);
@@ -16,7 +17,7 @@ export default function StudentDashboard() {
       .catch(() => setLoading(false));
   }, [user]);
 
-  if (loading) return <p>Loading courses...</p>;
+  if (loading) return <AppLoader message="Loading courses..." className="p-6" />;
 
   return (
     <div>
