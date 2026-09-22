@@ -1,4 +1,4 @@
-# 📚 Learning Management System (LMS)
+# 📚 Learning Management System (LMS)  
 
 A comprehensive Learning Management System designed to streamline online education. This web application offers an intuitive interface for instructors to create courses and for students to track their progress, fostering a seamless digital learning environment.
 
